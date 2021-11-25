@@ -10,7 +10,7 @@ random.seed(1)
 
 class WordNetAugmentation(AbstractSubTask):
     def __init__(self):
-        self.wordnet_path = files("resources") / "hungarian_wordnet.xml"
+        self.wordnet_path = files("resources") / "HuWN_final4.xml"
         self.synonyms_dict = {}
         self.stop_words = []
         self.wordnet_domains = ["geography", "quality", "law", "color", "time_period", "time period", "factotum"]

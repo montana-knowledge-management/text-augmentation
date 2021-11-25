@@ -5,6 +5,7 @@ from text_augmentation.data_augmentation import WordVectorAugmenter
 from text_augmentation.data_augmentation import EasyDataAugmentation
 from importlib_resources import files
 from scipy.stats import entropy
+import os
 
 example_input = [
     "KÚRIA Bfv szám Kúria Budapesten július napján megtartott tanácsülésen meghozta következő garázdaság vétsége volt".split(),
@@ -39,6 +40,16 @@ class AugmentationTestCase(unittest.TestCase):
         d.load_most_similar_dictionary(files("resources") / "most_similar_dict.json")
         self.assertIsNotNone(d.most_similar_dict)
         self.assertEqual(d.most_similar_dict["KÚRIA"][0][0], "KÚRIAI")
+
+    def test_save_most_similar_words(self):
+        d = WordVectorAugmenter()
+        dict_path = "/tmp/exmaple.json"
+        d.most_similar_dict = {"a": "b"}
+        d.save_most_similar_dictionary(dict_path)
+        self.assertTrue(os.path.isfile(dict_path))
+        d.most_similar_dict = {"c": "d"}
+        d.load_most_similar_dictionary(dict_path)
+        self.assertDictEqual(d.most_similar_dict, {"a": "b"})
 
     def test_augment_text_error(self):
         d = WordVectorAugmenter()
@@ -110,6 +121,16 @@ class AugmentationTestCase(unittest.TestCase):
         d.build_most_similar_dictionary(mode="fasttext")
         self.assertEqual(d.most_similar_dict.get("megtartott")[0], ("Playset-", 1.0000001192092896))
         self.assertEqual(d.most_similar_dict.get("indítványt")[0], ("rettegtem", 1.0000001192092896))
+
+    def test_build_most_similar_dict_error(self):
+        d = WordVectorAugmenter()
+        with self.assertRaises(ValueError) as context:
+            d.build_most_similar_dictionary(mode="fasttext")
+        with self.assertRaises(ValueError) as context:
+            d.build_most_similar_dictionary(mode="gensim")
+        with self.assertRaises(ValueError) as context:
+            d.build_most_similar_dictionary(mode="not defined")
+            self.assertIn("Wrong mode given! Please choose from 'gensim' or 'fasttext'!", context.exception)
 
     def test_augment_main(self):
         d = WordVectorAugmenter()
@@ -191,3 +212,6 @@ class AugmentationTestCase(unittest.TestCase):
             if idx % 2 == 1:
                 self.assertEqual(len(elem), len(example_input[1]))
                 self.assertNotEqual(" ".join(elem), " ".join(example_input[1]))
+
+    def save_synonyms_dict(self):
+        save_most_similar_dictionary

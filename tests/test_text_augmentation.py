@@ -1,5 +1,5 @@
 import unittest
-from examples.text_augmentation import eda_augmentation, word_vector_augmentation
+from examples.text_augmentation_example import eda_augmentation, word_vector_augmentation
 
 
 class AugmentationTest(unittest.TestCase):
