@@ -29,7 +29,7 @@ available or the dataset is highly imbalanced. This is the case when augmenting 
 
 ## Additional features
 
-###Protected words 
+### Protected words 
 
 One common problem would be in case of augmentation that there might be certain words that should not be modified by any
 means. To tackle this problem, `text-augmentation` package offers a list in which you can define the words to remain
