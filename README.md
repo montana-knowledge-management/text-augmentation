@@ -1,94 +1,36 @@
-# Template repository for distiller based projects
+# Text augmentation
 
-[![tests](https://github.com/montana-knowledge-management/distiller-based-plugin-template/actions/workflows/ci.yml/badge.svg)](https://github.com/robust/actions)
-[![codecov](https://codecov.io/gh/montana-knowledge-management/distiller-based-plugin-template/branch/main/graph/badge.svg?token=KMYGW7NHWH)](https://codecov.io/gh/montana-knowledge-management/distiller-based-plugin-template)
+[![tests](https://github.com/montana-knowledge-management/text-augmentation/actions/workflows/ci.yml/badge.svg)](https://github.com/robust/actions)
+[![codecov](https://codecov.io/gh/montana-knowledge-management/text-augmentation/branch/main/graph/badge.svg?token=KMYGW7NHWH)](https://codecov.io/gh/montana-knowledge-management/text-augmentation)
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://GitHub.com/Naereen/StrapDown.js/graphs/commit-activity)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-[![Total alerts](https://img.shields.io/lgtm/alerts/g/montana-knowledge-management/distiller-based-plugin-template.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/montana-knowledge-management/distiller-based-plugin-template/alerts/)
-[![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/montana-knowledge-management/distiller-based-plugin-template.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/montana-knowledge-management/distiller-based-plugin-template/context:python)
+[![Total alerts](https://img.shields.io/lgtm/alerts/g/montana-knowledge-management/text-augmentation.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/montana-knowledge-management/text-augmentation/alerts/)
+[![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/montana-knowledge-management/text-augmentation.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/montana-knowledge-management/text-augmentation/context:python)
 
-## How to use this template?
+## What is this repository good for?
 
-### Install `poetry`
+Augmenting data is a common solution in response to real world scenarios where either not enough training data is
+available or the dataset is highly imbalanced. This is the case when augmenting data can come to your rescue.
 
-If you didn't use `poetry` before, then you have to install it.
-The documentation can be found [here](https://python-poetry.org/docs/).
+## Currently implemented augmentation techniques
 
-1. Download the installer script somewhere:
+* Easy Data Augmentation: For more information, please refer to the paper of Wei and
+  Zou [here](https://arxiv.org/abs/1901.11196?ref=hackernoon.com).
+    * Random deletion
+    * Random swap
+    * Random synonym insertion
+    * Synonym replacement
+* Word vector based replacement
+    * `gensim` and `fastText`
+    * several selection criteria, like: pick first, pick uniformly, pick with user-defined weighted probabilities, pick
+      based on cosine distance weights.
+* Contextual-embedding based augmentation (soon to come)
 
-    **Note**: Make sure you don't have any virtual environment active in your terminal.
-    ```shell
-    curl -O https://raw.githubusercontent.com/python-poetry/poetry/master/install-poetry.py
-    ```
-2. Run the installation script:
-   ```shell
-   python3 install-poetry.py
-   ```
-   Pay attention to the script output, you might have to append the line below at the end of your `.bashrc` file.
-   ```shell
-   export PATH="$HOME/.poetry/bin:$PATH"
-   ```
+## Additional features
 
-### Installing dependencies
-At this stage you should have poetry installed on your system. The next step is to create a virtual environment and install
-the project dependencies:
-```shell
-poetry install
-```
-This command will create a `.venv` directory into the repository and install all dependeny.
+###Protected words 
 
-**Note**: If you are using Pycharm, then you should install the poetry plugin.
-
-#### Troubleshooting
-
-If `poetry` throws a `JSONEncodeEerror` you should clear the `poetry` cache:
-```shell
-rm -rf ~/.cache/pypoetry
-```
-
-### Badges
-
-Open this `README.md` file with your favorite editor and use its _Search and Replace_ function. 
-Search for `distiller-based-plugin-template`  and replace it with the repository name.
-
-### Package description
-
-Open the `pyproject.toml` file and change the relevant fields in the first section (`[tool.poetry]`):
-`<PACKAGENAME>`, `<DESCRIPTION>`
-
-### Making the source directory
-
-Create the source directory with the name of your choice. After that open the `pyproject.toml` file and 
-replace `src` with the directory name int the `[tool.coverage.run]` section.
-
-In the `.pre-commit-config.yaml` file the `pylint` section has a `files: '^src/'` row. Replace
-the `src` part with the source directory name.
-
-### Install `pre-commit` hooks
-
-Use this command to install `pre-commit` hooks. They will run before each commit and will correct your files to meet 
-the requirements:
-```shell
-pre-commit install --hook-type commit-msg --overwrite
-pre-commit install --hook-type=pre-commit --overwrite
-```
-
-## Development
-
-Run tests and calculating the coverage automatically:
-   ```shell
-   poetry run coverage run
-   ```
-   
-   Generating an html from the results
-   ```shell
-   poetry run coverage html
-   ```
-   
-   If your virtualenv is activated you can omit `poetry run` from the commands.
-   
-   Here is the compact form:
-   ```shell
-   clear;coverage run;coverage html;coverage report
-   ```
+One common problem would be in case of augmentation that there might be certain words that should not be modified by any
+means. To tackle this problem, `text-augmentation` package offers a list in which you can define the words to remain
+intact during the augmentation procedure. 
