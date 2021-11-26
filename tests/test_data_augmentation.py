@@ -22,15 +22,10 @@ class DummyFasttextModel:
         return self.inner_vocab.get(word)
 
 
-# for word in self.vocabulary:
-#     if word in self.gensim_model.wv.key_to_index:
-#         if word not in self.most_similar_dict:
-#             self.most_similar_dict[word] = self.gensim_model.wv.most_similar(
-#                 word, topn=self.topn_most_similar
-#             )
-#     else:
-
 class WordVectorDummy:
+    """
+        Dummy class to pretend the behavior of a fasttext word embedding model.
+        """
     def __init__(self):
         self.key_to_index = ["megtartott", "indítványt"]
 
@@ -42,6 +37,9 @@ class WordVectorDummy:
 
 
 class DummyGensimModel:
+    """
+    Dummy class to pretend the behavior of a gensim word embedding model.
+    """
     def __init__(self):
         self.wv = WordVectorDummy()
 
@@ -52,6 +50,12 @@ class AugmentationTestCase(unittest.TestCase):
         d = WordVectorAugmenter()
         pick = d.first_pick(lst)
         self.assertEqual(pick, "a")
+        pick_2 = d.first_pick(np.array(lst))
+        self.assertEqual(pick_2, "a")
+        pick_3 = d.first_pick(1)
+        self.assertEqual(pick_3, 1)
+        pick_4 = d.first_pick(tuple(lst))
+        self.assertEqual(pick_4, "a")
 
     def test_random_and_wighted_pick(self):
         lst = [("a", 3), ("b", 2), ("c", 1)]
@@ -67,6 +71,14 @@ class AugmentationTestCase(unittest.TestCase):
         entropy_random = entropy(np.array(list(random_picks.values())) / np.int64(1000), base=2)
         entropy_weighted = entropy(np.array(list(probability_weighted_picks.values())) / np.int64(1000), base=2)
         self.assertGreater(entropy_random, entropy_weighted)
+
+    def test_random_and_weighted_pick_errors(self):
+        lst = 1
+        d = WordVectorAugmenter()
+        pick = d.random_pick(lst)
+        self.assertEqual(pick, 1)
+        pick = d.weighted_probability_pick(lst + 1)
+        self.assertEqual(pick, 2)
 
     def test_load_most_similar_words(self):
         d = WordVectorAugmenter()
@@ -96,12 +108,42 @@ class AugmentationTestCase(unittest.TestCase):
         d.augment_text(example_input, augment_to)
         self.assertEqual(len(d.augmented_text), augment_to)
 
+    def test_augment_text_first(self):
+        d = WordVectorAugmenter()
+        augment_to = 9
+        d.load_most_similar_dictionary(files("resources") / "most_similar_dict.json")
+        d.augment_text(example_input, augment_to, picking_mode="first")
+        self.assertEqual(len(d.augmented_text), augment_to)
+
+    def test_augment_text_random(self):
+        d = WordVectorAugmenter()
+        augment_to = 5
+        d.load_most_similar_dictionary(files("resources") / "most_similar_dict.json")
+        d.augment_text(example_input, augment_to, picking_mode="random")
+        self.assertEqual(len(d.augmented_text), augment_to)
+
     def test_augment_text_(self):
         d = WordVectorAugmenter()
         augment_to = 10
         d.load_most_similar_dictionary(files("resources") / "most_similar_dict.json")
         d.augment_text(example_input, augment_to, picking_mode="random")
         self.assertEqual(len(d.augmented_text), augment_to)
+
+    def test_augment_text_exact_same_number_or_smaller(self):
+        d = WordVectorAugmenter()
+        augment_to = len(example_input)
+        d.load_most_similar_dictionary(files("resources") / "most_similar_dict.json")
+        with self.assertRaises(ValueError) as context:
+            d.augment_text(example_input, augment_to, picking_mode="random")
+            self.assertIn(
+                "The augmented size criterion has been already met. Please increase the augmented size above the number of documents!",
+                context.exception)
+        # checking lower doc count than the input
+        with self.assertRaises(ValueError) as context:
+            d.augment_text(example_input, augment_to - 1, picking_mode="random")
+            self.assertIn(
+                "The augmented size criterion has been already met. Please increase the augmented size above the number of documents!",
+                context.exception)
 
     # def test_wordnet_augmentation(self):
     #     d = WordVectorAugmenter()
@@ -158,7 +200,7 @@ class AugmentationTestCase(unittest.TestCase):
 
     def test_build_most_similar_dict_gensim(self):
         d = WordVectorAugmenter()
-        text = ["megtartott", "indítványt"]
+        text = ["megtartott", "indítványt", "hiány"]
         d.gensim_model = DummyGensimModel()
         d.build_vocab(text)
         d.build_most_similar_dictionary(mode="gensim")

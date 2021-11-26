@@ -27,16 +27,6 @@ class WordVectorAugmenter(AbstractTask):
         self.augmented_text = []
         self.protected_words = []
 
-    def define_subtasks(self, cache=None):
-        """
-        Loads pretrained gensim language model (e.g. FastText, Word2Vec, etc.)
-        :param cache: enables that loading is performed only once
-        :return:
-        """
-        self.fasttext_model = fasttext.load_model(
-            str(files("resources") / "cc.hu.2.bin")
-        )
-
     def load_gensim_model(self, model_path):
         """
         Loads gensim FastText models. Only bin format is supported!
@@ -141,7 +131,7 @@ class WordVectorAugmenter(AbstractTask):
         if len(text) >= augmented_size:
             raise ValueError(
                 "The augmented size criterion has been already met. Please increase the augmented size above the number"
-                "of documents!"
+                " of documents!"
             )
         if not protected_words:
             protected_words = self.protected_words
@@ -195,7 +185,8 @@ class WordVectorAugmenter(AbstractTask):
         :param similar_list: must be in the following format: [("token1",weight1),("token2",weight2)]
         :return: one token from the similar_list list
         """
-        if not isinstance(similar_list, list) or isinstance(similar_list, np.ndarray):
+        if not (isinstance(similar_list, list) or isinstance(similar_list, np.ndarray) or isinstance(similar_list,
+                                                                                                     tuple)):
             return similar_list
         return rng.choice(similar_list)[0]
 
@@ -206,7 +197,8 @@ class WordVectorAugmenter(AbstractTask):
         :param similar_list: must be in the following format: [("token1",weight1),("token2",weight2)]
         :return: one token from the similar_list list
         """
-        if not isinstance(similar_list, list) or isinstance(similar_list, np.ndarray):
+        if not (isinstance(similar_list, list) or isinstance(similar_list, np.ndarray) or isinstance(similar_list,
+                                                                                                     tuple)):
             return similar_list
         return similar_list[0]
 
@@ -218,7 +210,8 @@ class WordVectorAugmenter(AbstractTask):
         :param similar_list: must be in the following format: [("token1",weight1),("token2",weight2)]
         :return: one token from the similar_list list
         """
-        if not isinstance(similar_list, list) or isinstance(similar_list, np.ndarray):
+        if not (isinstance(similar_list, list) or isinstance(similar_list, np.ndarray) or isinstance(similar_list,
+                                                                                                     tuple)):
             return similar_list
         words = [word[0] for word in similar_list]
         weights = [wght[1] for wght in similar_list]
