@@ -13,6 +13,39 @@ example_input = [
 ]
 
 
+class DummyFasttextModel:
+    def __init__(self):
+        self.inner_vocab = {"megtartott": [[0.985296392440796, "megtart"], [0.6585092544555664, "megrendezett"]],
+                            "indítványt": [[0.8903484106063843, "indítványokat"], [0.7796140909194946, "indítványát"]]}
+
+    def get_nearest_neighbors(self, word: str, k=2):
+        return self.inner_vocab.get(word)
+
+
+# for word in self.vocabulary:
+#     if word in self.gensim_model.wv.key_to_index:
+#         if word not in self.most_similar_dict:
+#             self.most_similar_dict[word] = self.gensim_model.wv.most_similar(
+#                 word, topn=self.topn_most_similar
+#             )
+#     else:
+
+class WordVectorDummy:
+    def __init__(self):
+        self.key_to_index = ["megtartott", "indítványt"]
+
+        self.inner_vocab = {"megtartott": [("megtart", 0.985296392440796), ("megrendezett", 0.6585092544555664)],
+                            "indítványt": [("indítványokat", 0.8903484106063843), ("indítványát", 0.7796140909194946)]}
+
+    def most_similar(self, word, topn=2):
+        return self.inner_vocab.get(word)
+
+
+class DummyGensimModel:
+    def __init__(self):
+        self.wv = WordVectorDummy()
+
+
 class AugmentationTestCase(unittest.TestCase):
     def test_first_pick(self):
         lst = ["a", "b", "c"]
@@ -114,15 +147,23 @@ class AugmentationTestCase(unittest.TestCase):
         d.build_vocab(text, **params)
         self.assertEqual(len(d.vocabulary), 23)
 
-    # def test_build_most_similar_dict(self):
-    #     d = WordVectorAugmenter()
-    #     text = ["megtartott", "indítványt"]
-    #     d.build_vocab(text)
-    #     # loading fasttext model
-    #     d.define_subtasks()
-    #     d.build_most_similar_dictionary(mode="fasttext")
-    #     self.assertEqual(d.most_similar_dict.get("megtartott")[0], ("Playset-", 1.0000001192092896))
-    #     self.assertEqual(d.most_similar_dict.get("indítványt")[0], ("rettegtem", 1.0000001192092896))
+    def test_build_most_similar_dict_fasttext(self):
+        d = WordVectorAugmenter()
+        text = ["megtartott", "indítványt"]
+        d.fasttext_model = DummyFasttextModel()
+        d.build_vocab(text)
+        d.build_most_similar_dictionary(mode="fasttext")
+        self.assertEqual(d.most_similar_dict.get("megtartott")[0], ('megtart', 0.985296392440796))
+        self.assertEqual(d.most_similar_dict.get("indítványt")[0], ('indítványokat', 0.8903484106063843))
+
+    def test_build_most_similar_dict_gensim(self):
+        d = WordVectorAugmenter()
+        text = ["megtartott", "indítványt"]
+        d.gensim_model = DummyGensimModel()
+        d.build_vocab(text)
+        d.build_most_similar_dictionary(mode="gensim")
+        self.assertEqual(d.most_similar_dict.get("megtartott")[0], ('megtart', 0.985296392440796))
+        self.assertEqual(d.most_similar_dict.get("indítványt")[0], ('indítványokat', 0.8903484106063843))
 
     def test_build_most_similar_dict_error(self):
         d = WordVectorAugmenter()
@@ -130,6 +171,7 @@ class AugmentationTestCase(unittest.TestCase):
             d.build_most_similar_dictionary(mode="fasttext")
         with self.assertRaises(ValueError) as context:
             d.build_most_similar_dictionary(mode="gensim")
+            self.assertIn("Missing loaded gensim model. Please load gensim model!", context.exception)
         with self.assertRaises(ValueError) as context:
             d.build_most_similar_dictionary(mode="not defined")
             self.assertIn("Wrong mode given! Please choose from 'gensim' or 'fasttext'!", context.exception)

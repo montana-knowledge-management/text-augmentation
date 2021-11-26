@@ -1,6 +1,6 @@
 # Text augmentation
 
-[![tests](https://github.com/montana-knowledge-management/text-augmentation/actions/workflows/ci.yml/badge.svg)](https://github.com/text-augmentation/actions)
+[![tests](https://github.com/montana-knowledge-management/text-augmentation/actions/workflows/ci.yml/badge.svg)](https://github.com/montana-knowledge-management/text-augmentation/actions)
 [![codecov](https://codecov.io/gh/montana-knowledge-management/text-augmentation/branch/main/graph/badge.svg?token=KMYGW7NHWH)](https://codecov.io/gh/montana-knowledge-management/text-augmentation)
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://GitHub.com/Naereen/StrapDown.js/graphs/commit-activity)
