@@ -114,15 +114,15 @@ class AugmentationTestCase(unittest.TestCase):
         d.build_vocab(text, **params)
         self.assertEqual(len(d.vocabulary), 23)
 
-    def test_build_most_similar_dict(self):
-        d = WordVectorAugmenter()
-        text = ["megtartott", "indítványt"]
-        d.build_vocab(text)
-        # loading fasttext model
-        d.define_subtasks()
-        d.build_most_similar_dictionary(mode="fasttext")
-        self.assertEqual(d.most_similar_dict.get("megtartott")[0], ("Playset-", 1.0000001192092896))
-        self.assertEqual(d.most_similar_dict.get("indítványt")[0], ("rettegtem", 1.0000001192092896))
+    # def test_build_most_similar_dict(self):
+    #     d = WordVectorAugmenter()
+    #     text = ["megtartott", "indítványt"]
+    #     d.build_vocab(text)
+    #     # loading fasttext model
+    #     d.define_subtasks()
+    #     d.build_most_similar_dictionary(mode="fasttext")
+    #     self.assertEqual(d.most_similar_dict.get("megtartott")[0], ("Playset-", 1.0000001192092896))
+    #     self.assertEqual(d.most_similar_dict.get("indítványt")[0], ("rettegtem", 1.0000001192092896))
 
     def test_build_most_similar_dict_error(self):
         d = WordVectorAugmenter()

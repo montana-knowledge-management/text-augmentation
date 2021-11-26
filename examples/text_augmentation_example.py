@@ -19,7 +19,7 @@ def word_vector_augmentation():
     augmenter = WordVectorAugmenter()
     print("Loading custom fasttext model.")
     # Note that this path should point to the downloaded fasttext bin file for the required language.
-    augmenter.load_fasttext_model(str(files("resources") / "cc.hu.2.bin"))
+    # augmenter.load_fasttext_model(str(files("resources") / "cc.hu.2.bin"))
     # print("Building vocabulary.")
     # augmenter.build_vocab(test_text)
     # print("Building most similar dict.")
