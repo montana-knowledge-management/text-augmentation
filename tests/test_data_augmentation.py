@@ -8,8 +8,8 @@ from scipy.stats import entropy
 import os
 
 example_input = [
-    "KÚRIA Bfv szám Kúria Budapesten július napján megtartott tanácsülésen meghozta következő garázdaság vétsége volt".split(),
-    "miatt folyamatban volt büntetőügyben Legfőbb Ügyészség által előterjesztett felülvizsgálati indítványt".split(),
+    "KÚRIA Bfv szám Kúria Budapesten július napján ezért megtartott tanácsülésen meghozta következő garázdaság vétsége volt".split(),
+    "miatt folyamatban volt büntetőügyben Legfőbb Ügyészség ezért által előterjesztett felülvizsgálati indítványt".split(),
 ]
 
 
@@ -70,11 +70,11 @@ class AugmentationTestCase(unittest.TestCase):
         d.augment_text(example_input, augment_to, picking_mode="random")
         self.assertEqual(len(d.augmented_text), augment_to)
 
-    def test_wordnet_augmentation(self):
-        d = WordVectorAugmenter()
-        augment_to = 10
-        d.augment_text(example_input, augment_to, picking_mode="wordnet")
-        self.assertEqual(len(d.augmented_text), augment_to)
+    # def test_wordnet_augmentation(self):
+    #     d = WordVectorAugmenter()
+    #     augment_to = 10
+    #     d.augment_text(example_input, augment_to, picking_mode="wordnet")
+    #     self.assertEqual(len(d.augmented_text), augment_to)
 
     def test_eda_deletion(self):
         eda = EasyDataAugmentation()
@@ -90,6 +90,7 @@ class AugmentationTestCase(unittest.TestCase):
 
     def test_eda_insert(self):
         eda = EasyDataAugmentation()
+        eda.init_wordnet(files("tests") / "data_test" / "wordnet_example_file.xml")
         sample = ["ez", "egy", "piros", "mégis"]
         # since one synonym is inserted, the length should be one more than the original data
         new_data = eda.random_insertion(sample, 1)
@@ -97,6 +98,7 @@ class AugmentationTestCase(unittest.TestCase):
 
     def test_eda_synonym_replacement(self):
         eda = EasyDataAugmentation()
+        eda.init_wordnet(files("tests") / "data_test" / "wordnet_example_file.xml")
         sample = ["ez", "egy", "minta", "tulajdonképp", "mégis"]
         # since only one word is replaced by its synonym, the intersection with the original data is one less than the
         # length of the original data
@@ -108,13 +110,13 @@ class AugmentationTestCase(unittest.TestCase):
         text = [" ".join(example) for example in example_input]
         params = {"lowercase": True}
         d.build_vocab(text)
-        self.assertEqual(len(d.vocabulary), 23)
+        self.assertEqual(len(d.vocabulary), 24)
         d.build_vocab(text, **params)
-        self.assertEqual(len(d.vocabulary), 22)
+        self.assertEqual(len(d.vocabulary), 23)
 
     def test_build_most_similar_dict(self):
         d = WordVectorAugmenter()
-        text = [" ".join(example) for example in example_input]
+        text = ["megtartott", "indítványt"]
         d.build_vocab(text)
         # loading fasttext model
         d.define_subtasks()
@@ -137,9 +139,8 @@ class AugmentationTestCase(unittest.TestCase):
         protected_lst = ["garázdaság", "vétsége", "Legfőbb", "Ügyészség"]
         text = [" ".join(example) for example in example_input]
         d.build_vocab(text)
-        # loading fasttext model
-        d.define_subtasks()
-        d.build_most_similar_dictionary(mode="fasttext")
+        # loading previously calculated similarities
+        d.load_most_similar_dictionary(files("resources") / "most_similar_dict.json")
         d.augment_text(example_input, 10, protected_words=protected_lst, alpha=1.0)
         # protected words must remain intact
         for word in protected_lst:
@@ -163,6 +164,7 @@ class AugmentationTestCase(unittest.TestCase):
 
     def test_eda_augment_text_random_deletion(self):
         eda = EasyDataAugmentation()
+        eda.init_wordnet(files("tests") / "data_test" / "wordnet_example_file.xml")
         eda.augment_text(example_input, 10, mode="RD", protected_words=["garázdaság", "volt"], alpha=0.5)
         max_size = max(len(example_input[0]), len(example_input[1]))
         for elem in eda.augmented_text[2:]:
@@ -172,21 +174,23 @@ class AugmentationTestCase(unittest.TestCase):
 
     def test_eda_augment_text_random_insertion(self):
         eda = EasyDataAugmentation()
+        eda.init_wordnet(files("tests") / "data_test" / "wordnet_example_file.xml")
         eda.augment_text(example_input, 10, mode="RI", alpha=0.5, protected_words=["volt"])
         for idx, elem in enumerate(eda.augmented_text[2:]):
             # checking if the word volt can be found in all documents
             self.assertIn("volt", elem)
             if idx % 2 == 0:
-                # after insertion the legth should be higher
+                # after insertion the length should be higher
                 self.assertGreater(len(elem), len(example_input[0]))
                 self.assertNotEqual(" ".join(elem), " ".join(example_input[0]))
             if idx % 2 == 1:
-                # after insertion the legth should be higher
+                # after insertion the length should be higher
                 self.assertGreater(len(elem), len(example_input[1]))
                 self.assertNotEqual(" ".join(elem), " ".join(example_input[1]))
 
     def test_eda_augment_text_random_swap(self):
         eda = EasyDataAugmentation()
+        eda.init_wordnet(files("tests") / "data_test" / "wordnet_example_file.xml")
         eda.augment_text(example_input, 10, mode="RS", alpha=0.2)
         for idx, elem in enumerate(eda.augmented_text[2:]):
             if idx % 2 == 0:
@@ -202,6 +206,7 @@ class AugmentationTestCase(unittest.TestCase):
 
     def test_eda_augment_text_synonym_replacement(self):
         eda = EasyDataAugmentation()
+        eda.init_wordnet(files("tests") / "data_test" / "wordnet_example_file.xml")
         eda.augment_text(example_input, 10, mode="SR", alpha=0.5, protected_words=["volt"])
         for idx, elem in enumerate(eda.augmented_text[2:]):
             # checking if the word volt can be found in all documents
@@ -213,5 +218,6 @@ class AugmentationTestCase(unittest.TestCase):
                 self.assertEqual(len(elem), len(example_input[1]))
                 self.assertNotEqual(" ".join(elem), " ".join(example_input[1]))
 
-    def save_synonyms_dict(self):
-        save_most_similar_dictionary
+
+if __name__ == '__main__':
+    unittest.main()

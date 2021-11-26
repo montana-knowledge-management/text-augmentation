@@ -8,10 +8,11 @@ class WordnetTestCase(unittest.TestCase):
     def test_wordnet_example(self):
         test_text = TextReader().read(
             str(files("examples") / "data" / "augmentation_example_2.txt"))
-        print(test_text)
         wordnet_augmenter = WordNetAugmentation()
+        wordnet_augmenter.wordnet_path = files("tests") / "data_test" / "wordnet_example_file.xml"
         wordnet_augmenter.load_synonyms_dict()
-        result = " ".join(wordnet_augmenter.run(test_text.split()))
+        result = wordnet_augmenter.run(test_text.split(), n=2)
+        result = " ".join(result)
         self.assertFalse(test_text == result)
 
 

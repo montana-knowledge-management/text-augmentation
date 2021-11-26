@@ -239,9 +239,12 @@ class EasyDataAugmentation:
 
     def __init__(self):
         self.protected_words = []
-        self.wordnet = WordNetAugmentation()
-        self.wordnet.load_synonyms_dict()
         self.augmented_text = []
+
+    def init_wordnet(self, wordnet_path):
+        self.wordnet = WordNetAugmentation()
+        self.wordnet.set_wordnet_path(wordnet_path)
+        self.wordnet.load_synonyms_dict()
 
     def set_protected_words(self, protected_words_list):
         """

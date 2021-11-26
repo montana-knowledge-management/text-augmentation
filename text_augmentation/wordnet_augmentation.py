@@ -23,9 +23,11 @@ class WordNetAugmentation(AbstractSubTask):
         self.wordnet_path = wordnet_path
 
     def load_synonyms_dict(self):
-        with open(self.wordnet_path, encoding="ISO-8859-2") as file:
-            text = file.read()
-
+        try:
+            with open(self.wordnet_path, encoding="ISO-8859-2") as file:
+                text = file.read()
+        except FileNotFoundError:
+            raise FileNotFoundError("HuWN_final4.xml is missing from resources, please run download_wordnet.py to download it!")
         synset_pat = re.compile(
             r"<SYNSET>.*?<DOMAIN>(?:{})</DOMAIN>.*?</SYNSET>".format("|".join(self.wordnet_domains))
         )
