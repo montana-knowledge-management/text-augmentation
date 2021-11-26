@@ -21,6 +21,15 @@ class DownloadTestCase(unittest.TestCase):
         download_needed = not os.path.isfile(wordnet_downloader.wordnet_xml_path)
         self.assertEqual(download_needed, wordnet_downloader.download_needed)
 
+    def test_check_existing_file_2(self):
+        zip_path = str(files("tests") / "data_test" / "wordnet_example_file.zip")
+        xml_path = str(files("tests") / "data_test" / "wordnet_example_file.xml")
+
+        wordnet_downloader = WordNetDownloader(wordnet_zip_path=zip_path,
+                                               wordnet_xml_path=xml_path)
+        wordnet_downloader.check_existing_file()
+        self.assertEqual(wordnet_downloader.download_needed, False)
+
     def test_unzip_cleanup(self):
         zip_path = str(files("tests") / "data_test" / "wordnet_example_file.zip")
         tmp_zip_file = "/tmp/wordnet_example_file.zip"
