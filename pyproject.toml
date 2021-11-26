@@ -1,7 +1,7 @@
 # Main package description
 [tool.poetry]
 name = "text-augmentation"
-version = "0.1.0"
+version = "2021.1"
 description = "Package to perform text augmentation."
 authors = [
     "MONTANA Knowledge Management ltd. <info@distiller.dev>"
@@ -70,8 +70,6 @@ exclude_lines = [
     '@(abc\.)?abstractmethod'
 ]
 omit = ['tests', "resources", "data"]
-
-
 
 # ISORT
 # https://pycqa.github.io/isort/docs/configuration/options.html

@@ -6,6 +6,7 @@ from text_augmentation.data_augmentation import EasyDataAugmentation
 from importlib_resources import files
 from scipy.stats import entropy
 import os
+import fasttext
 
 example_input = [
     "KÚRIA Bfv szám Kúria Budapesten július napján ezért megtartott tanácsülésen meghozta következő garázdaság vétsége volt".split(),
